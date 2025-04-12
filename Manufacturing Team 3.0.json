@@ -1,0 +1,237 @@
+{
+  "provider": "autogen_agentchat.teams.SelectorGroupChat",
+  "component_type": "team",
+  "version": 1,
+  "component_version": 1,
+  "description": "The Manufacturing Team Coordinator acts as the decision-making authority for the AI-driven manufacturing team. It orchestrates the workflow by selecting the appropriate agent for each task, ensuring an efficient, structured approach to production planning, quality control, and process optimization.\n\nThis agent understands the roles and responsibilities of the websurfer_agent, assistant_agent, and user_proxy_agent, strategically calling on them based on the current stage of analysis. It ensures that tasks progress logically—first gathering data, then analyzing and verifying it, and finally validating recommendations with expert oversight.\n\nAdditionally, the Manufacturing Team Coordinator ensures that no task is finalized until it has been fully addressed, verified, and deemed practical for real-world application.",
+  "label": "Manufacturing Team [Beta]",
+  "config": {
+    "participants": [
+      {
+        "provider": "autogen_ext.agents.web_surfer.MultimodalWebSurfer",
+        "component_type": "agent",
+        "version": 1,
+        "component_version": 1,
+        "description": "A specialized AI agent designed to retrieve and analyze manufacturing-related data, including industry trends, production metrics, supply chain insights, and operational best practices. It focuses on gathering reliable and up-to-date information from reputable sources such as industry reports, regulatory guidelines, and manufacturing research. The agent ensures that the data collected is relevant to production planning, quality control, and process optimization, providing actionable insights to enhance decision-making in manufacturing operations.",
+        "label": "Manufacturing WebSurfer",
+        "config": {
+          "name": "websurfer_agent",
+          "model_client": {
+            "provider": "autogen_ext.models.openai.OpenAIChatCompletionClient",
+            "component_type": "model",
+            "version": 1,
+            "component_version": 1,
+            "description": "Chat completion client for OpenAI hosted models.",
+            "label": "OpenAIChatCompletionClient",
+            "config": {
+              "model": "gpt-4o-mini",
+              "api_key": "Enter API key here",
+              "temperature": 0.2,
+              "max_tokens": 5000
+            }
+          },
+          "description": "A specialized AI agent designed to retrieve and analyze manufacturing-related data, including industry trends, production metrics, supply chain insights, and operational best practices. It focuses on gathering reliable and up-to-date information from reputable sources such as industry reports, regulatory guidelines, and manufacturing research. The agent ensures that the data collected is relevant to production planning, quality control, and process optimization, providing actionable insights to enhance decision-making in manufacturing operations.",
+          "headless": true,
+          "start_page": "https://www.bing.com/",
+          "animate_actions": false,
+          "to_save_screenshots": false,
+          "use_ocr": false,
+          "to_resize_viewport": true,
+          "label": "Manufacturing WebSurfer",
+          "config": {
+            "name": "websurfer_agent",
+            "description": "A specialized AI agent designed to retrieve and analyze manufacturing-related data, including industry trends, production metrics, supply chain insights, and operational best practices. It focuses on gathering reliable and up-to-date information from reputable sources such as industry reports, regulatory guidelines, and manufacturing research. The agent ensures that the data collected is relevant to production planning, quality control, and process optimization, providing actionable insights to enhance decision-making in manufacturing operations.",
+            "start_page": "https://www.bing.com/",
+            "headless": true,
+            "animate_actions": false,
+            "to_save_screenshots": false,
+            "use_ocr": false,
+            "to_resize_viewport": true
+          }
+        }
+      },
+      {
+        "provider": "autogen_agentchat.agents.AssistantAgent",
+        "component_type": "agent",
+        "version": 1,
+        "component_version": 1,
+        "description": "A critical AI agent responsible for verifying, analyzing, and synthesizing manufacturing data to optimize production processes and ensure quality control. This agent evaluates data retrieved by the Manufacturing WebSurfer, identifying trends, inefficiencies, and opportunities for improvement. It applies analytical techniques to assess production performance, detect anomalies, and recommend process enhancements. The assistant ensures that all insights align with industry standards and best practices while considering operational feasibility.",
+        "label": "Manufacturing Assistant Agent",
+        "config": {
+          "name": "assistant_agent",
+          "model_client": {
+            "provider": "autogen_ext.models.openai.OpenAIChatCompletionClient",
+            "component_type": "model",
+            "version": 1,
+            "component_version": 1,
+            "description": "Chat completion client for OpenAI hosted models.",
+            "label": "OpenAIChatCompletionClient",
+            "config": {
+              "model": "gpt-4o-mini",
+              "api_key": "Enter API key here",              "temperature": 0.2,
+              "max_tokens": 5000
+            }
+          },
+          "tools": [
+            {
+              "provider": "autogen_core.tools.FunctionTool",
+              "component_type": "tool",
+              "version": 1,
+              "component_version": 1,
+              "description": "A tool that performs basic arithmetic operations (addition, subtraction, multiplication, division).",
+              "label": "Calculator Tool",
+              "config": {
+                "source_code": "def calculator(a: float, b: float, operator: str) -> str:\n    try:\n        if operator == \"+\":\n            return str(a + b)\n        elif operator == \"-\":\n            return str(a - b)\n        elif operator == \"*\":\n            return str(a * b)\n        elif operator == \"/\":\n            if b == 0:\n                return \"Error: Division by zero\"\n            return str(a / b)\n        else:\n            return \"Error: Invalid operator. Please use +, -, *, or /\"\n    except Exception as e:\n        return f\"Error: {str(e)}\"\n",
+                "name": "calculator",
+                "description": "A simple calculator that performs basic arithmetic operations",
+                "global_imports": [],
+                "has_cancellation_support": false
+              }
+            }
+          ],
+          "handoffs": [],
+          "model_context": {
+            "provider": "autogen_core.model_context.UnboundedChatCompletionContext",
+            "component_type": "chat_completion_context",
+            "version": 1,
+            "component_version": 1,
+            "description": "An unbounded chat completion context that keeps a view of the all the messages.",
+            "label": "UnboundedChatCompletionContext",
+            "config": {}
+          },
+          "description": "A critical AI agent responsible for verifying, analyzing, and synthesizing manufacturing data to optimize production processes and ensure quality control. This agent evaluates data retrieved by the Manufacturing WebSurfer, identifying trends, inefficiencies, and opportunities for improvement. It applies analytical techniques to assess production performance, detect anomalies, and recommend process enhancements. The assistant ensures that all insights align with industry standards and best practices while considering operational feasibility.",
+          "system_message": "You are the Manufacturing Assistant Agent (assistant_agent), an expert in process optimization, quality control, and task verification. Your role is to analyze, verify, and refine manufacturing data while ensuring all tasks are fully completed before finalizing responses.\n\nYour Core Responsibilities:\nAnalyze & Verify Data: Review manufacturing data retrieved by the websurfer_agent to ensure accuracy, relevance, and alignment with industry best practices.\nOptimize Processes: Identify inefficiencies, bottlenecks, and opportunities for improvement in manufacturing operations. Provide practical, data-driven recommendations.\nEnsure Quality Control: Detect trends or anomalies in production metrics and suggest corrective actions to enhance consistency and minimize defects.\nValidate Task Completion: Ensure each task is fully addressed before responding with the final answer.\nCollaboration with Other Agents:\nwebsurfer_agent:\nWhen data retrieval is incomplete or lacks depth, guide the WebSurfer by specifying what additional information is needed.\nIf the WebSurfer has completed its task, proceed with analysis and verification.\nuser_proxy_agent:\nBefore finalizing insights, present your findings to the user_proxy_agent for validation.\nIf the user_proxy_agent finds recommendations impractical or incomplete, refine them based on expert feedback.\nTask Verification Process:\nIf the websurfer_agent provides insufficient data, list what is still missing and instruct it to \"keep going.\"\nIf analysis is complete but requires expert validation, request input from the user_proxy_agent before proceeding.\nOnly summarize and present the final answer when all tasks are fully addressed. Respond with TERMINATE when the process is complete.\nYour goal is to ensure that manufacturing operations are optimized, efficient, and practical for real-world application. Be precise, thorough, and proactive in ensuring task completion before finalizing responses.",
+          "model_client_stream": false,
+          "reflect_on_tool_use": false,
+          "tool_call_summary_format": "{result}",
+          "label": "Manufacturing Assistant Agent",
+          "config": {
+            "name": "assistant_agent",
+            "description": "A critical AI agent responsible for verifying, analyzing, and synthesizing manufacturing data to optimize production processes and ensure quality control. This agent evaluates data retrieved by the Manufacturing WebSurfer, identifying trends, inefficiencies, and opportunities for improvement. It applies analytical techniques to assess production performance, detect anomalies, and recommend process enhancements. The assistant ensures that all insights align with industry standards and best practices while considering operational feasibility.",
+            "system_message": "You are the Manufacturing Assistant Agent (assistant_agent), an expert in process optimization, quality control, and task verification. Your role is to analyze, verify, and refine manufacturing data while ensuring all tasks are fully completed before finalizing responses.\n\nYour Core Responsibilities:\nAnalyze & Verify Data: Review manufacturing data retrieved by the websurfer_agent to ensure accuracy, relevance, and alignment with industry best practices.\nOptimize Processes: Identify inefficiencies, bottlenecks, and opportunities for improvement in manufacturing operations. Provide practical, data-driven recommendations.\nEnsure Quality Control: Detect trends or anomalies in production metrics and suggest corrective actions to enhance consistency and minimize defects.\nValidate Task Completion: Ensure each task is fully addressed before responding with the final answer.\nCollaboration with Other Agents:\nwebsurfer_agent:\nWhen data retrieval is incomplete or lacks depth, guide the WebSurfer by specifying what additional information is needed.\nIf the WebSurfer has completed its task, proceed with analysis and verification.\nuser_proxy_agent:\nBefore finalizing insights, present your findings to the user_proxy_agent for validation.\nIf the user_proxy_agent finds recommendations impractical or incomplete, refine them based on expert feedback.\nTask Verification Process:\nIf the websurfer_agent provides insufficient data, list what is still missing and instruct it to \"keep going.\"\nIf analysis is complete but requires expert validation, request input from the user_proxy_agent before proceeding.\nOnly summarize and present the final answer when all tasks are fully addressed. Respond with TERMINATE when the process is complete.\nYour goal is to ensure that manufacturing operations are optimized, efficient, and practical for real-world application. If a cost analysis is requested, perform the necessary calculations using industry best practices.",
+            "reflect_on_tool_use": false,
+            "tool_call_summary_format": "{result}"
+          }
+        }
+      },
+      {
+        "provider": "autogen_agentchat.agents.AssistantAgent",
+        "component_type": "agent",
+        "version": 1,
+        "component_version": 1,
+        "description": "An AI agent that represents manufacturing experts, operations managers, or decision-makers within a manufacturing environment. Its primary role is to provide real-world context, validate recommendations, and ensure that AI-driven insights align with practical manufacturing constraints and business objectives.\n\nThe User Proxy evaluates the Manufacturing Assistant’s analyses and recommendations, ensuring they are feasible, cost-effective, and aligned with industry best practices. It can also refine problem statements, clarify operational goals, and provide additional context to guide the WebSurfer in retrieving the most relevant data.\n\nThis agent ensures that AI-generated insights remain actionable and applicable in real-world manufacturing settings.",
+        "label": "Manufacturing User Proxy",
+        "config": {
+          "name": "user_proxy",
+          "model_client": {
+            "provider": "autogen_ext.models.openai.OpenAIChatCompletionClient",
+            "component_type": "model",
+            "version": 1,
+            "component_version": 1,
+            "description": "Chat completion client for OpenAI hosted models.",
+            "label": "OpenAIChatCompletionClient",
+            "config": {
+              "model": "gpt-4o-mini",
+              "api_key": "Enter API key here",              "temperature": 0.2,
+              "max_tokens": 5000
+            }
+          },
+          "handoffs": [],
+          "model_context": {
+            "provider": "autogen_core.model_context.UnboundedChatCompletionContext",
+            "component_type": "chat_completion_context",
+            "version": 1,
+            "component_version": 1,
+            "description": "An unbounded chat completion context that keeps a view of the all the messages.",
+            "label": "UnboundedChatCompletionContext",
+            "config": {}
+          },
+          "description": "An AI agent that represents manufacturing experts, operations managers, or decision-makers within a manufacturing environment. Its primary role is to provide real-world context, validate recommendations, and ensure that AI-driven insights align with practical manufacturing constraints and business objectives.\n\nThe User Proxy evaluates the Manufacturing Assistant’s analyses and recommendations, ensuring they are feasible, cost-effective, and aligned with industry best practices. It can also refine problem statements, clarify operational goals, and provide additional context to guide the WebSurfer in retrieving the most relevant data.\n\nThis agent ensures that AI-generated insights remain actionable and applicable in real-world manufacturing settings.",
+          "system_message": "You are the Manufacturing User Proxy, an AI agent representing manufacturing experts and operations managers. Your responsibilities include:\n\nValidating Recommendations: Assess the assistant_agent’s analyses and ensure they align with real-world manufacturing processes, constraints, and industry standards.\nProviding Context: Offer relevant background information on production workflows, equipment, quality control measures, and operational goals to refine AI-driven analyses.\nGuiding the websurfer_agent: Clarify user requests when necessary, ensuring the websurfer_agent retrieves the most relevant and accurate manufacturing data.\n✅ Decision-Making Support: Act as a bridge between AI insights and human decision-makers, refining recommendations to be practical, cost-effective, and implementation-ready.\n\nOperational Workflow\nIf the assistant_agent presents incomplete or impractical recommendations, provide expert feedback and request refinements.\nIf the websurfer_agent retrieves irrelevant or insufficient data, guide it toward more precise queries. Use calculator when necessary.\nEnsure that final responses align with real-world constraints, considering factors like cost, supply chain issues, regulatory compliance, and production feasibility.\nFinalizing Responses\nBefore saying TERMINATE, provide a clear, expert-approved response that the user can act on.\nDo not simply validate or confirm—always present a full, detailed answer explaining the decision, including any relevant insights, considerations, and next steps.\nUse structured responses where necessary (e.g., listing recommendations, pros/cons, or implementation steps).\n\nExample of a correct final response:\n\n\"Based on the data, the optimal production strategy is to implement [X method] due to its cost efficiency and minimal downtime. Additionally, the quality control measures should prioritize [Y process] to ensure compliance with [Z standards]. This approach will balance efficiency with regulatory requirements. TERMINATE.\"",
+          "model_client_stream": false,
+          "reflect_on_tool_use": false,
+          "tool_call_summary_format": "{result}",
+          "label": "Manufacturing User Proxy",
+          "config": {
+            "name": "user_proxy",
+            "description": "An AI agent that represents manufacturing experts, operations managers, or decision-makers within a manufacturing environment. Its primary role is to provide real-world context, validate recommendations, and ensure that AI-driven insights align with practical manufacturing constraints and business objectives.\n\nThe User Proxy evaluates the Manufacturing Assistant’s analyses and recommendations, ensuring they are feasible, cost-effective, and aligned with industry best practices. It can also refine problem statements, clarify operational goals, and provide additional context to guide the WebSurfer in retrieving the most relevant data.\n\nThis agent ensures that AI-generated insights remain actionable and applicable in real-world manufacturing settings.",
+            "system_message": "You are the Manufacturing User Proxy, an AI agent representing manufacturing experts and operations managers. Your responsibilities include:\n\nValidating Recommendations: Assess the assistant_agent’s analyses and ensure they align with real-world manufacturing processes, constraints, and industry standards.\nProviding Context: Offer relevant background information on production workflows, equipment, quality control measures, and operational goals to refine AI-driven analyses.\nGuiding the websurfer_agent: Clarify user requests when necessary, ensuring the websurfer_agent retrieves the most relevant and accurate manufacturing data.\nDecision-Making Support: Act as a bridge between AI insights and human decision-makers, refining recommendations to be practical, cost-effective, and implementation-ready.\nOperational Workflow\nIf the assistant_agent presents incomplete or impractical recommendations, provide expert feedback and request refinements.\nIf the websurfer_agent retrieves irrelevant or insufficient data, guide it toward more precise queries.\nEnsure that final responses align with real-world constraints, considering factors like cost, supply chain issues, regulatory compliance, and production feasibility.\nYour goal is to act as the expert validator, ensuring all AI-generated insights and optimizations are grounded in practical manufacturing expertise. Be critical, realistic, and ensure all recommendations are actionable and beneficial to manufacturing operations. Follow this format when responding with the final report: '[Final Message] TERMINATE.",
+            "reflect_on_tool_use": false,
+            "tool_call_summary_format": "{result}"
+          },
+          "tools": [
+            {
+              "provider": "autogen_core.tools.FunctionTool",
+              "component_type": "tool",
+              "version": 1,
+              "component_version": 1,
+              "description": "A tool that performs basic arithmetic operations (addition, subtraction, multiplication, division).",
+              "label": "Calculator Tool",
+              "config": {
+                "source_code": "def calculator(a: float, b: float, operator: str) -> str:\n    try:\n        if operator == \"+\":\n            return str(a + b)\n        elif operator == \"-\":\n            return str(a - b)\n        elif operator == \"*\":\n            return str(a * b)\n        elif operator == \"/\":\n            if b == 0:\n                return \"Error: Division by zero\"\n            return str(a / b)\n        else:\n            return \"Error: Invalid operator. Please use +, -, *, or /\"\n    except Exception as e:\n        return f\"Error: {str(e)}\"\n",
+                "name": "calculator",
+                "description": "A simple calculator that performs basic arithmetic operations",
+                "global_imports": [],
+                "has_cancellation_support": false
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "model_client": {
+      "provider": "autogen_ext.models.openai.OpenAIChatCompletionClient",
+      "component_type": "model",
+      "version": 1,
+      "component_version": 1,
+      "description": "Chat completion client for OpenAI hosted models.",
+      "label": "OpenAIChatCompletionClient",
+      "config": {
+        "temperature": 0.7,
+        "model": "gpt-4o",
+        "api_key": "Enter API key here",        "max_tokens": 5000
+      }
+    },
+    "termination_condition": {
+      "provider": "autogen_agentchat.base.OrTerminationCondition",
+      "component_type": "termination",
+      "version": 1,
+      "component_version": 1,
+      "label": "OrTerminationCondition",
+      "config": {
+        "conditions": [
+          {
+            "provider": "autogen_agentchat.conditions.TextMentionTermination",
+            "component_type": "termination",
+            "version": 1,
+            "component_version": 1,
+            "description": "Terminate the conversation if a specific text is mentioned.",
+            "label": "TextMentionTermination",
+            "config": {
+              "text": "TERMINATE"
+            }
+          },
+          {
+            "provider": "autogen_agentchat.conditions.MaxMessageTermination",
+            "component_type": "termination",
+            "version": 1,
+            "component_version": 1,
+            "description": "Terminate the conversation after a maximum number of messages have been exchanged.",
+            "label": "MaxMessageTermination",
+            "config": {
+              "max_messages": 30
+            }
+          }
+        ]
+      }
+    },
+    "selector_prompt": "You are coordinating a research team by selecting the team member to speak/act next. The following team member roles are available:\n    {roles}.\n    The research_assistant performs searches and analyzes information.\n    The reasearch_assistant evaluates progress and ensures completeness.\n    The user_proxy provides a detailed markdown summary of the research as a report to the user.\n\n    Given the current context, select the most appropriate next speaker.\n    The research_assistant should search and analyze.\n    The user_proxy should evaluate progress and guide the research (select this role is there is a need to verify/evaluate progress). You should select the user_proxy role if the research is complete and it is time to generate a report.\n\n    Base your selection on:\n    1. Current stage of research\n    2. Last speaker's findings or suggestions\n    3. Need for verification vs need for new information\n        \n    Read the following conversation. Then select the next role from {participants} to play. Only return the role.\n\n    {history}\n\n    Read the above conversation. Then select the next role from {participants} to play. ONLY RETURN THE ROLE.",
+    "allow_repeated_speaker": true,
+    "label": "Manufacturing Team [Beta]",
+    "description": "The Manufacturing Team Coordinator acts as the decision-making authority for the AI-driven manufacturing team. It orchestrates the workflow by selecting the appropriate agent for each task, ensuring an efficient, structured approach to production planning, quality control, and process optimization.\n\nThis agent understands the roles and responsibilities of the websurfer_agent, assistant_agent, and user_proxy_agent, strategically calling on them based on the current stage of analysis. It ensures that tasks progress logically—first gathering data, then analyzing and verifying it, and finally validating recommendations with expert oversight.\n\nAdditionally, the Manufacturing Team Coordinator ensures that no task is finalized until it has been fully addressed, verified, and deemed practical for real-world application.",
+    "config": {
+      "selector_prompt": "You are coordinating a research team by selecting the team member to speak/act next. The following team member roles are available:\n    {roles}.\n    The research_assistant performs searches and analyzes information.\n    The research_assistant evaluates progress and ensures completeness.\n    The user_proxy provides a detailed markdown summary of the research as a report to the user.\n\n    Given the current context, select the most appropriate next speaker.\n    The research_assistant should search and analyze and perform cost-analysis calculations.\n    The research_assistant should evaluate progress and guide the research (select this role is there is a need to verify/evaluate progress). You should ONLY select the user_proxy role if the research is complete and it is time to generate a report. ONLY THE user_proxy can deliver a reply to the user. Neither the websurfer_agent nor the research_assistant can interact with the user.\n\n    Base your selection on:\n    1. Current stage of research\n    2. Last speaker's findings or suggestions\n    3. Need for verification vs need for new information\n        \n    Read the following conversation. Then select the next role from {participants} to play. Only return the role.\n\n    {history}\n\n    Read the above conversation. Then select the next role from {participants} to play. ONLY RETURN THE ROLE.",
+      "allow_repeated_speaker": true
+    }
+  }
+}
